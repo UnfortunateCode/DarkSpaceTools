@@ -35,7 +35,7 @@ public class RuleMaker {
 					score[species] += numNonEmpireSystems(created[galaxyAttempt]);
 					score[species] += lengthNonBranching(created[galaxyAttempt]);
 					score[species] += differenceFromIdealSize(created[galaxyAttempt]);
-					
+					// From phone
 				}
 			
 				
