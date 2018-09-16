@@ -7,6 +7,9 @@ import java.util.Random;
 import darkspace.Rules_Base.Rule;
 import fatetools.FATERoll;
 
+import org.graphstream.graph.*;
+import org.graphstream.graph.implementations.*;
+
 /**
  * Contains a galaxy of connected systems.
  * 
@@ -270,9 +273,52 @@ public class Galaxy {
 	}
 
 	public static void main(String[] args) {
-		Galaxy g = new Galaxy(new Rules_Test1(), 25, 60);
+		Galaxy g = new Galaxy(new Rules_RandomFATE(), 25, 60);
 		
 		g.displayGalaxy();
+		Random r = new Random();
+		System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+		String styleSheet =
+		        "node {" +
+		        "	fill-color: rgb(" + (128+r.nextInt(128)) + "," + (128+r.nextInt(128)) + "," + (128+r.nextInt(128)) + ");" +
+		        "} ";
+		        
+		
+		Graph graph = new SingleGraph("Galaxy");
+		graph.setStrict(false);
+		graph.setAutoCreate(false);
+		
+		MemberSystem ms;
+		Node n;
+		LinkedList<String> labels = new LinkedList<>();
+		
+		for (int i = 0; i < g.memberSystems.length; ++i) {
+			ms = g.memberSystems[i];
+			n = graph.addNode(ms.getName());
+			n.addAttribute("ui.label", ms.labelEmpires());
+			n.addAttribute("ui.class", "node." + ms.labelEmpires());
+			
+			if (!labels.contains(ms.labelEmpires())) {
+				labels.add(ms.labelEmpires());
+			}
+		}
+		
+		for (String label : labels) {
+			styleSheet += 
+					"node." + label + " {" +
+			        "	fill-color: rgb(" + (128+r.nextInt(128)) + "," + (128+r.nextInt(128)) + "," + (128+r.nextInt(128)) + ");" +
+			        "} ";
+		}
+		
+		for (int i = 0; i < g.memberSystems.length; ++i) {
+			ms = g.memberSystems[i];
+			for (MemberSystem msConn : ms.getConnections()) {
+				graph.addEdge(ms + " " + msConn, ms.getName(), msConn.getName());
+			}
+		}
+
+	    graph.addAttribute("ui.stylesheet", styleSheet);
+		graph.display();
 	}
 
 }

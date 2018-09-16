@@ -25,6 +25,10 @@ public class MemberSystem {
 	}
 	
 	
+	// TODO This breaks private contract : Replace with iterator
+	public LinkedList<MemberSystem> getConnections() {
+		return linkedSystems;
+	}
 	public int numEmpires() {
 		return empireNames.size();
 	}
@@ -131,6 +135,21 @@ public class MemberSystem {
 		
 		return result;
 	}
+	
+	public String labelEmpires() {
+		if (empireNames.size() == 0) {
+			return "";
+		}
+		
+		String result = "";
+		
+		for (String name : empireNames) {
+			result += name + "_";
+		}
+				
+		return result;
+	}
+	
 
 	public String getName() {
 		return name;
