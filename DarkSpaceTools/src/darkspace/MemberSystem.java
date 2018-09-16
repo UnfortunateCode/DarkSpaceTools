@@ -5,15 +5,21 @@ import java.util.LinkedList;
 import fatetools.FATERoll;
 
 public class MemberSystem {
+	public static int CapitalLimit = 3;
+	
 	private int technology, environment, resources;
 	private String name;
 	private LinkedList<MemberSystem> linkedSystems = new LinkedList<>();
-	private LinkedList<String> empireNames = new LinkedList<>();
+	private LinkedList<Empire> empires = new LinkedList<>();
 	private int empirePower = 0;
 	private boolean capital = false;
+	private Empire capitalOf;
 	
-	public void addEmpire(String empireName) {
-		empireNames.add(empireName);
+	public void addNewEmpire() {
+		capitalOf = new Empire();
+		empires.add(capitalOf);
+		empirePower = getEmpireCapability();
+		capital = true;
 	}
 	
 	public void setCapital(boolean isCapital) {
@@ -24,13 +30,11 @@ public class MemberSystem {
 		return capital;
 	}
 	
-	
-	// TODO This breaks private contract : Replace with iterator
 	public LinkedList<MemberSystem> getConnections() {
-		return linkedSystems;
+		return (LinkedList<MemberSystem>)linkedSystems.clone();
 	}
 	public int numEmpires() {
-		return empireNames.size();
+		return empires.size();
 	}
 
 	public int getEmpirePower() {
@@ -40,12 +44,18 @@ public class MemberSystem {
 	public void setEmpirePower(int empirePower) {
 		this.empirePower = empirePower;
 	}
+	
+	
 
 	public MemberSystem() {
 		name = "Unnamed";
 		technology = FATERoll.getRoll();
 		environment = FATERoll.getRoll();
 		resources = FATERoll.getRoll();
+		
+		if (technology + environment >= CapitalLimit) {
+			addNewEmpire();
+		}
 	}
 	
 	public MemberSystem(String systemName) {
@@ -53,6 +63,10 @@ public class MemberSystem {
 		technology = FATERoll.getRoll();
 		environment = FATERoll.getRoll();
 		resources = FATERoll.getRoll();
+		
+		if (technology + environment >= CapitalLimit) {
+			addNewEmpire();
+		}
 	}
 	
 	public MemberSystem(int tech, int env, int res) {
@@ -60,6 +74,10 @@ public class MemberSystem {
 		technology = tech;
 		environment = env;
 		resources = res;
+		
+		if (technology + environment >= CapitalLimit) {
+			addNewEmpire();
+		}
 	}
 	
 	public MemberSystem(String systemName, int tech, int env, int res) {
@@ -67,6 +85,10 @@ public class MemberSystem {
 		technology = tech;
 		environment = env;
 		resources = res;
+		
+		if (technology + environment >= CapitalLimit) {
+			addNewEmpire();
+		}
 	}
 
 	public int getTechnology() {
@@ -121,14 +143,14 @@ public class MemberSystem {
 	}
 	
 	public String printEmpires() {
-		if (empireNames.size() == 0) {
+		if (empires.size() == 0) {
 			return "";
 		}
 		
 		String result = "[";
 		
-		for (String name : empireNames) {
-			result += name + " ";
+		for (Empire empire : empires) {
+			result += empire.getName() + " ";
 		}
 		
 		result += "- " + empirePower + "]";
@@ -137,14 +159,19 @@ public class MemberSystem {
 	}
 	
 	public String labelEmpires() {
-		if (empireNames.size() == 0) {
+		if (empires.size() == 0) {
 			return "";
 		}
 		
 		String result = "";
 		
-		for (String name : empireNames) {
-			result += name + "_";
+		for (Empire empire : empires) {
+			if (isCapital() && empire.equals(capitalOf)) {
+				result += empire.getName().toUpperCase() + "_";
+			} else {
+				result += empire.getName().toLowerCase() + "_";
+			}
+			
 		}
 				
 		return result;
@@ -173,16 +200,44 @@ public class MemberSystem {
 		if (empirePower <= 1) {
 			return;
 		}
+		
+		int numEmpires = empires.size();
+		
+		if (numEmpires == 0) {
+			System.err.println("MemberSystem: Spreading empires with no empires");
+			empirePower = 0;
+			return;
+		}
+		
+		boolean single = (numEmpires == 1);
+		
 		for (MemberSystem ms : linkedSystems) {
 			if (ms.empirePower < empirePower - 1) {
 				ms.empirePower = empirePower - 1;
-				ms.empireNames.clear();
-				ms.empireNames.addAll(empireNames);
+				
+				for (Empire empire : ms.empires) {
+					empire.remove(ms);
+				}
+				ms.empires.clear();
+				ms.empires.addAll(empires);
+				
+				for (Empire empire : empires) {
+					if (single) {
+						empire.addMember(ms);
+					} else {
+						empire.addShared(ms);
+					}
+				}
 				ms.setCapital(false);
 			} else if (ms.empirePower == empirePower - 1) {
-				for (String names : empireNames) {
-					if (!ms.empireNames.contains(names)) {
-						ms.empireNames.add(names);
+				for (Empire empire : empires) {
+					if (!ms.empires.contains(empire)) {
+						if (single) {
+							empire.addMember(ms);
+						} else {
+							empire.addShared(ms);
+						}
+						ms.empires.add(empire);
 					}
 				}
 			}

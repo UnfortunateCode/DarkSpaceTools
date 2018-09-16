@@ -4,28 +4,31 @@ public class EmpireNames {
 	double nextName = 0;
 
 	public String getNextName() {
-		String result = "";
-		if (nextName == 0) {
-			result = "A";
-		} else {
-			double derivedName = nextName;
-			int nextChar;
-			char base = 'A';
-			for (double place = Math.floor((Math.log(nextName) / Math.log(26))); place >= 0; --place) {
-				nextChar = (int)(derivedName / Math.pow(26, place));
-				result += (char)(base + nextChar);
-
-				derivedName -= nextChar * Math.pow(26, place);
-			}
-		}
-		++nextName;
-		return result;
+		return nameOf(nextName++);
 	}
 
 	public double getCount() {
 		return nextName;
 	}
 	
+	public static String nameOf(double id) {
+		String result = "";
+		if (id == 0) {
+			result = "A";
+		} else {
+			double derivedName = id;
+			int nextChar;
+			char base = 'A';
+			for (double place = Math.floor((Math.log(id) / Math.log(26))); place >= 0; --place) {
+				nextChar = (int)(derivedName / Math.pow(26, place));
+				result += (char)(base + nextChar);
+
+				derivedName -= nextChar * Math.pow(26, place);
+			}
+		}
+		
+		return result;
+	}
 	public static void main (String[] args) {
 		EmpireNames emp = new EmpireNames();
 

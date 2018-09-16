@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import darkspace.Rules_Base.Rule;
 
 public abstract class Rules_Base {
-	public static enum Rule { BACKFIRSTLEAST, BACKFIRSTMOST, NEXT, NEXTNEW , BACKRANDOM}
+	public static enum Rule { BACKFIRSTLEAST, BACKFIRSTMOST, NEXT, NEXTNEW, RANDOMCAPITAL, BACKRANDOM}
 	
 	@SuppressWarnings("unchecked")
 	protected LinkedList<Rule>[] theseRules = new LinkedList[9];

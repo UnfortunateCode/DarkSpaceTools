@@ -30,17 +30,17 @@ public class Galaxy {
 		
 	}
 	
+	public Galaxy(int[][] galacticInputs) {
+		// TODO Auto-generated constructor stub
+	}
+
 	private void buildGalaxy(Rules_Base rules, int minSize, int maxSize) {
 		galacticRules = rules;
 		memberSystems = new MemberSystem[maxSize];
 		rulesChosen = new int[maxSize];
-		
-//System.err.println(galacticRules);
-//System.err.println(minSize + " - " + maxSize);
-		
+				
 		memberSystems[0] = new MemberSystem("0");
 		int currentSystem = 0;
-		int lastSystem = 0;
 		LinkedList<Rule> currentRules;
 		
 		for (int ruleChoice = 0; ruleChoice < maxSize; ++ruleChoice) {
@@ -52,27 +52,28 @@ public class Galaxy {
 				memberSystems[currentSystem] = new MemberSystem("" + currentSystem);
 			}
 			
-//System.err.println("Working on " + memberSystems[currentSystem] + ": " + memberSystems[currentSystem].printConnections());
 			
 			currentRules = galacticRules.getRule(rulesChosen[currentSystem]);
 			
 			for (Rule rr : currentRules) {
-//System.err.println("Enforcing " + rr);
 				switch (rr) {
 				case BACKFIRSTLEAST:
-					lastSystem = processBackFirstLeast(currentSystem, lastSystem);
+					processBackFirstLeast(currentSystem);
 					break;
 				case BACKFIRSTMOST:
-					lastSystem = processBackFirstMost(currentSystem, lastSystem);
+					processBackFirstMost(currentSystem);
 					break;
 				case NEXT:
-					lastSystem = processNext(currentSystem, lastSystem);
+					processNext(currentSystem);
 					break;
 				case NEXTNEW:
-					lastSystem = processNextNew(currentSystem, lastSystem);
+					processNextNew(currentSystem);
 					break;
 				case BACKRANDOM:
-					lastSystem = processBackRandom(currentSystem, lastSystem);
+					processBackRandom(currentSystem);
+					break;
+				case RANDOMCAPITAL:
+					processRandomCapital(currentSystem);
 					break;
 				}
 			}
@@ -102,11 +103,7 @@ public class Galaxy {
 		for (int sysCount = 0; sysCount < memberSystems.length; ++sysCount) {
 			ms = memberSystems[sysCount];
 			
-			if (ms.getEmpireCapability() > 2) {
-				 ms.addEmpire(empName.getNextName());
-				 ms.setEmpirePower(ms.getEmpireCapability());
-				 ms.setCapital(true);
-				 
+			if (ms.isCapital()) {				 
 				 capability = Math.max(capability, ms.getEmpirePower());
 			}
 		}
@@ -128,12 +125,12 @@ public class Galaxy {
 		empires = new Empire[(int)empName.getCount()];
 		
 		for (int sysCount = 0; sysCount < memberSystems.length; ++sysCount) {
-			
+			// TODO
 		}
 		
 	}
 	
-	private int processBackFirstLeast(int currentSystem, int lastSystem) {
+	private void processBackFirstLeast(int currentSystem) {
 		int connections = memberSystems.length;
 		MemberSystem ms = null;
 		
@@ -152,10 +149,10 @@ public class Galaxy {
 		}
 
 		
-		return lastSystem;
+		return;
 	}
 
-	private int processBackFirstMost(int currentSystem, int lastSystem) {
+	private void processBackFirstMost(int currentSystem) {
 		int connections = -1;
 		MemberSystem ms = null;
 		
@@ -174,10 +171,10 @@ public class Galaxy {
 		}
 
 		
-		return lastSystem;
+		return;
 	}
 
-	private int processBackRandom(int currentSystem, int lastSystem) {
+	private void processBackRandom(int currentSystem) {
 		LinkedList<MemberSystem> availSystems = new LinkedList<>();
 		
 		for (int nextPotential = 0; nextPotential < currentSystem; ++nextPotential) {
@@ -187,7 +184,7 @@ public class Galaxy {
 		}
 		
 		if (availSystems.size() == 0) {
-			return lastSystem;
+			return;
 		}
 		
 		Random r = new Random();
@@ -197,10 +194,10 @@ public class Galaxy {
 		memberSystems[currentSystem].linkTo(ms);
 		ms.linkTo(memberSystems[currentSystem]);
 		
-		return lastSystem;
+		return;
 	}
 
-	private int processNextNew(int currentSystem, int lastSystem) {
+	private void processNextNew(int currentSystem) {
 		int nextPotential = currentSystem + 1;
 		
 		while (true) {
@@ -210,11 +207,11 @@ public class Galaxy {
 						memberSystems[currentSystem].linkTo(memberSystems[nextPotential]);
 						memberSystems[nextPotential].linkTo(memberSystems[currentSystem]);
 						
-						return lastSystem;
+						return;
 					}
 				}
 				
-				return lastSystem;
+				return;
 			}
 			
 			if (memberSystems[nextPotential] == null) {
@@ -222,15 +219,40 @@ public class Galaxy {
 				memberSystems[currentSystem].linkTo(memberSystems[nextPotential]);
 				memberSystems[nextPotential].linkTo(memberSystems[currentSystem]);
 				
-				return nextPotential;
+				return;
 			}
 			
 			++nextPotential;
 		}
 		
 	}
+	
+	private void processRandomCapital(int currentSystem) {
+		LinkedList<MemberSystem> availSystems = new LinkedList<>();
+		
+		for (int nextPotential = 0; nextPotential < currentSystem; ++nextPotential) {
+			if (memberSystems[nextPotential] != null && 
+					!memberSystems[currentSystem].isLinkedTo(memberSystems[nextPotential]) &&
+					memberSystems[nextPotential].isCapital()) {
+				availSystems.add(memberSystems[nextPotential]);
+			}
+		}
+		
+		if (availSystems.size() == 0) {
+			return;
+		}
+		
+		Random r = new Random();
+		MemberSystem ms;
+		ms = memberSystems[r.nextInt(availSystems.size())];
+		
+		memberSystems[currentSystem].linkTo(ms);
+		ms.linkTo(memberSystems[currentSystem]);
+		
+		return;
+	}
 
-	private int processNext(int currentSystem, int lastSystem) {
+	private void processNext(int currentSystem) {
 		int nextPotential = currentSystem + 1;
 		
 		while (true) {
@@ -239,7 +261,7 @@ public class Galaxy {
 			}
 			
 			if (nextPotential == currentSystem) {
-				return lastSystem;
+				return;
 			}
 			
 			if (memberSystems[nextPotential] == null) {
@@ -247,7 +269,7 @@ public class Galaxy {
 				memberSystems[currentSystem].linkTo(memberSystems[nextPotential]);
 				memberSystems[nextPotential].linkTo(memberSystems[currentSystem]);
 				
-				return nextPotential;
+				return;
 			}
 			
 			if (memberSystems[currentSystem].isLinkedTo(memberSystems[nextPotential])) {
@@ -256,7 +278,7 @@ public class Galaxy {
 				memberSystems[currentSystem].linkTo(memberSystems[nextPotential]);
 				memberSystems[nextPotential].linkTo(memberSystems[currentSystem]);
 				
-				return lastSystem;
+				return;
 			}
 		}
 		
@@ -274,6 +296,13 @@ public class Galaxy {
 
 	public static void main(String[] args) {
 		Galaxy g = new Galaxy(new Rules_RandomFATE(), 25, 60);
+		
+		long timer = System.currentTimeMillis();
+		for (int i = 0; i < 10000000; ++i) {
+			g = new Galaxy(new Rules_RandomFATE(), 25, 60);
+		}
+		System.out.println(System.currentTimeMillis() - timer);
+		
 		
 		g.displayGalaxy();
 		Random r = new Random();
@@ -296,17 +325,17 @@ public class Galaxy {
 			ms = g.memberSystems[i];
 			n = graph.addNode(ms.getName());
 			n.addAttribute("ui.label", ms.labelEmpires());
-			n.addAttribute("ui.class", "node." + ms.labelEmpires());
+			n.addAttribute("ui.class", "" + ms.labelEmpires().toUpperCase());
 			
-			if (!labels.contains(ms.labelEmpires())) {
-				labels.add(ms.labelEmpires());
+			if (!labels.contains(ms.labelEmpires().toUpperCase())) {
+				labels.add(ms.labelEmpires().toUpperCase());
 			}
 		}
 		
 		for (String label : labels) {
 			styleSheet += 
 					"node." + label + " {" +
-			        "	fill-color: rgb(" + (128+r.nextInt(128)) + "," + (128+r.nextInt(128)) + "," + (128+r.nextInt(128)) + ");" +
+			        "	fill-color: rgb(" + (64+r.nextInt(192)) + "," + (64+r.nextInt(192)) + "," + (64+r.nextInt(192)) + ");" +
 			        "} ";
 		}
 		
