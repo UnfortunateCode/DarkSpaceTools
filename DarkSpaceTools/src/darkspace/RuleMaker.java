@@ -12,6 +12,8 @@ public class RuleMaker {
 		int numGens = 0;
 		int[][][] galacticInputs = new int[3][60][4]; // 3 Galaxies, 60 MemberSystemsMax, [RuleRule, Technology, Environment, Resources]
 		Galaxy[] created = new Galaxy[3];
+		int minSize = 25;
+		int maxSize = 60;
 		
 		for (int speciesCounter = 0; speciesCounter < generation.length; ++speciesCounter) {
 			generation[speciesCounter] = new Rules_Given(new Rules_RandomFATE());
@@ -30,11 +32,11 @@ public class RuleMaker {
 			for (int species = 0; species < generation.length; ++species) {
 				score[species] = 0;
 				for (int galaxyAttempt = 0; galaxyAttempt < galacticInputs.length; ++galaxyAttempt) {
-					created[galaxyAttempt] = new Galaxy(galacticInputs[galaxyAttempt]);
+					created[galaxyAttempt] = new Galaxy(generation[species], minSize, maxSize, galacticInputs[galaxyAttempt]);
 					
-					score[species] += numNonEmpireSystems(created[galaxyAttempt]);
-					score[species] += lengthNonBranching(created[galaxyAttempt]);
-					score[species] += differenceFromIdealSize(created[galaxyAttempt]);
+					score[species] += created[galaxyAttempt].numNonEmpireSystems();
+					score[species] += created[galaxyAttempt].lengthNonBranching();
+					score[species] += created[galaxyAttempt].differenceFromIdealSize();
 					// From phone
 				}
 			
@@ -43,5 +45,4 @@ public class RuleMaker {
 			
 		} while (++numGens < 10000);
 	}
-
 }

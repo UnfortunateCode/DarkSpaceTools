@@ -30,7 +30,7 @@ public class Galaxy {
 		
 	}
 	
-	public Galaxy(int[][] galacticInputs) {
+	public Galaxy(Rules_Base rules, int minSize, int maxSize, int[][] galacticInputs) {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -93,6 +93,35 @@ public class Galaxy {
 		}
 		
 		buildEmpires();
+	}
+	
+	public int numNonEmpireSystems() {
+		int num = 0;
+		
+		for (int sysCount = 0; sysCount < memberSystems.length; ++sysCount) {
+			if (memberSystems[sysCount].numEmpires() > 0) {
+				++num;
+			}
+		}
+		return num;
+	}
+	
+	public int lengthNonBranching() {
+		int num = 0;
+		int cur = 0;
+		
+		LinkedList<MemberSystem> found = new LinkedList<>();
+		
+		for (int sysCount = 0; sysCount < memberSystems.length;++sysCount){
+			if (memberSystems[sysCount].getConnections().size() == 2 &&
+				  !found.contains(memberSystems[sysCount])) {
+				cur = memberSystems[sysCount].numNonBranching();
+					
+				num = Math.max(num, cur);
+			}
+		}
+		
+		return num;
 	}
 	
 	private void buildEmpires() {

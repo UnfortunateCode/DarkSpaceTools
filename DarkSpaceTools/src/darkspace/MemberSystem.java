@@ -45,6 +45,17 @@ public class MemberSystem {
 		this.empirePower = empirePower;
 	}
 	
+	public int numNonBranching() {
+		int num = 0;
+		
+		if (linkedSystems.size() == 2) {
+			++num;
+			
+			MemberSystem ms =
+		}
+		
+		return num;
+	}
 	
 
 	public MemberSystem() {
