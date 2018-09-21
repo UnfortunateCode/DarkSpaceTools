@@ -17,11 +17,6 @@ public class Rules_RandomFATE extends Rules_Base {
 		Rule[] rules = Rule.values();
 		Random rand = new Random();
 		
-		
-		for (int listsCounter = 0; listsCounter < theseRules.length; ++listsCounter) {
-			
-		}
-		
 		for (int rollCounter = 0; rollCounter < theseRules.length; ++rollCounter) {
 			theseRules[rollCounter] = new LinkedList<>();
 			numRules = Math.abs(FATERoll.getRoll());

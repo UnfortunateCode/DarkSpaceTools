@@ -1,9 +1,23 @@
 package darkspace;
 
 import java.util.LinkedList;
+import java.util.Queue;
 
 import fatetools.FATERoll;
 
+
+/**
+ * MemberSystem holds the basic data for individual solar systems.
+ * A system is defined by three statistics: Technology, Environment,
+ * and Resources. Empires form out of systems that have high Technology
+ * and Environment scores. Corporations form out of systems with decent
+ * Environment or Resources. For the fiction, Corporations that arrive
+ * out of high Environment scores are generally Service-based, while those
+ * arriving out of high Resources are generally Materials-based.
+ * 
+ *
+ * @author UnfortunateCode
+ */
 public class MemberSystem {
 	public static int CapitalLimit = 3;
 	
@@ -45,18 +59,71 @@ public class MemberSystem {
 		this.empirePower = empirePower;
 	}
 	
-	public int numNonBranching() {
-		int num = 0;
+	public LinkedList<MemberSystem> numNonBranching() {
+		LinkedList<MemberSystem> branchSystems = new LinkedList<>();
 		
 		if (linkedSystems.size() == 2) {
-			++num;
+			branchSystems.add(this);
 			
-			MemberSystem ms =
+			for (MemberSystem ms : linkedSystems) {
+				ms.addNext(branchSystems, this);
+			}
+		}
+		
+		return branchSystems;
+	}
+	
+	public LinkedList<MemberSystem> allConnected() {
+		LinkedList<MemberSystem> all = new LinkedList<>();
+		Queue<MemberSystem> lookAt = new LinkedList<>();
+		MemberSystem activeMS;
+		
+		all.add(this);
+		
+		all.addAll(linkedSystems);
+		
+		lookAt.addAll(linkedSystems);
+		
+		while (!lookAt.isEmpty()) {
+			activeMS = lookAt.remove();
+			
+			for (MemberSystem ms : activeMS.linkedSystems) {
+				if (!all.contains(ms)) {
+					all.add(ms);
+					lookAt.add(ms);
+				}
+			}
+		}	
+		
+		
+		return all;
+	}
+	
+	public int numPowers() {
+		int num = 0;
+		
+		for (Empire emp : empires) {
+			if (emp.isPower()) {
+				++num;
+			}
 		}
 		
 		return num;
 	}
 	
+	private void addNext(LinkedList<MemberSystem> branchSystems, MemberSystem prevSystem) {
+		if (branchSystems.contains(this)) {
+			return;
+		}
+		if (linkedSystems.size() == 2) {
+			branchSystems.add(this);
+			if (linkedSystems.getFirst() == prevSystem) {
+				linkedSystems.getLast().addNext(branchSystems, this);
+			} else {
+				linkedSystems.getFirst().addNext(branchSystems, this);
+			}
+		}
+	}
 
 	public MemberSystem() {
 		name = "Unnamed";

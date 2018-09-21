@@ -17,11 +17,6 @@ public class Rules_Given extends Rules_Base {
 		Rule[] rules = Rule.values();
 		Random rand = new Random();
 		
-		
-		for (int listsCounter = 0; listsCounter < theseRules.length; ++listsCounter) {
-			
-		}
-		
 		for (int rollCounter = 0; rollCounter < theseRules.length; ++rollCounter) {
 			theseRules[rollCounter] = new LinkedList<>();
 			numRules = Math.abs(FATERoll.getRoll());
@@ -34,8 +29,16 @@ public class Rules_Given extends Rules_Base {
 		}
 	}
 	
+	public Rules_Given(boolean clear) {
+		for (int rollCounter = 0; rollCounter < theseRules.length; ++rollCounter) {
+			theseRules[rollCounter] = new LinkedList<>();
+		}
+	}
+	
 	public Rules_Given(Rules_Base rules) {
-		// TODO Auto-generated constructor stub
+		for (int rollCounter = 0; rollCounter < theseRules.length; ++ rollCounter) {
+			theseRules[rollCounter] = (LinkedList<Rule>)rules.theseRules[rollCounter].clone();
+		}
 	}
 
 	public void addRule(int dieRoll, Rule rule) {
@@ -52,20 +55,36 @@ public class Rules_Given extends Rules_Base {
 
 
 	public static void main (String[] args) {
-		Rules_Given rr;
+		Rules_Given r1, r2;
 		int sin;
 		
 		while(true) {
 
-			rr = new Rules_Given();
+			r1 = new Rules_Given();
+			r2 = new Rules_Given();
 			
-			System.out.println(rr);
+			System.out.println(r1);
+			System.out.println(r2);
 			
+			System.out.println("Crossover:");
+			r1.crossoverWith(r2);
 
-			for (int i = 0; i < 5; ++i) {
-				System.out.print(rr.counts[i] + " ");
-			}
-			System.out.println();
+			System.out.println(r1);
+			System.out.println(r2);
+			
+			System.out.println("Mutations:");
+			r1.mutate();
+			r2.mutate();
+
+			System.out.println(r1);
+			System.out.println(r2);
+			
+			System.out.println("Local Split:");
+			r1.localSplit();
+			r2.localSplit();
+
+			System.out.println(r1);
+			System.out.println(r2);
 			
 			try {
 			sin = System.in.read();
@@ -73,6 +92,47 @@ public class Rules_Given extends Rules_Base {
 				
 			}
 		}
+	}
+
+	public void crossoverWith(Rules_Base rules) {
+		Random r = new Random();
+		
+		int index1 = r.nextInt(9);
+		int index2 = r.nextInt(9);
+		
+		LinkedList<Rule> toSwitch = theseRules[index1];
+		theseRules[index1] = rules.theseRules[index2];
+		rules.theseRules[index2] = toSwitch;
+		
+		
+	}
+
+	public void mutate() {
+		Rules_Given newRandRules = new Rules_Given();
+		Random r = new Random();
+		
+		theseRules[r.nextInt(9)] = newRandRules.theseRules[r.nextInt(9)];
+		
+	}
+
+	public void localSplit() {
+
+		Random r = new Random();
+		int index = r.nextInt(9);
+		
+		
+		LinkedList<Rule> toSplit = theseRules[index];
+		LinkedList<Rule> fromSplit;
+		theseRules[index] = new LinkedList<>();
+		
+		while (!toSplit.isEmpty()) {
+			fromSplit = theseRules[r.nextInt(9)];
+			if (!fromSplit.isEmpty()) {
+				theseRules[index].add(fromSplit.remove(r.nextInt(fromSplit.size())));
+			} 
+			fromSplit.add(toSplit.pop());
+		}
+		
 	}
 
 }
