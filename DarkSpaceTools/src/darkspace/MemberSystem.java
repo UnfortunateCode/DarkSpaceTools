@@ -29,6 +29,62 @@ public class MemberSystem {
 	private boolean capital = false;
 	private Empire capitalOf;
 	
+	/**
+	 * Default constructor generating random values.
+	 *
+	 * If T+E >= CapitalLimit, then a new Empire is created.
+	 */
+	public MemberSystem() {
+		name = "Unnamed";
+		technology = FATERoll.getRoll();
+		environment = FATERoll.getRoll();
+		resources = FATERoll.getRoll();
+
+		if (technology + environment >= CapitalLimit) {
+			addNewEmpire();
+		}
+	}
+	
+	/**
+	 * Constructor to specify the name of the system
+	 * with the other values being randomized.
+	 *
+	 * If T+E >= CapitalLimit, then a new Empire is created
+	 *
+	 * @param systemName name to be displayed through toString
+	 */
+	public MemberSystem(String systemName) {
+		name = systemName;
+		technology = FATERoll.getRoll();
+		environment = FATERoll.getRoll();
+		resources = FATERoll.getRoll();
+
+		if (technology + environment >= CapitalLimit) {
+			addNewEmpire();
+		}
+	}
+
+	/**
+	 * Full specification constructor.
+	 *
+	 * If T+E >= CapitalLimit, then a new Empire is created
+	 *
+	 * @param systemName name to be displayed through toString
+	 * @param tech the Technology score of the system [-4,4]
+	 * @param env the Environment score of the system [-4,4]
+	 * @param res the Resources score of the systwm [-4,4]
+	 */
+	public MemberSystem(String systemName, int tech, int env, int res) {
+		name = systemName;
+		technology = tech;
+		environment = env;
+		resources = res;
+
+		if (technology + environment >= CapitalLimit) {
+			addNewEmpire();
+		}
+	}
+	
 	public void addNewEmpire() {
 		capitalOf = new Empire();
 		empires.add(capitalOf);
@@ -125,49 +181,9 @@ public class MemberSystem {
 		}
 	}
 
-	public MemberSystem() {
-		name = "Unnamed";
-		technology = FATERoll.getRoll();
-		environment = FATERoll.getRoll();
-		resources = FATERoll.getRoll();
-		
-		if (technology + environment >= CapitalLimit) {
-			addNewEmpire();
-		}
-	}
 	
-	public MemberSystem(String systemName) {
-		name = systemName;
-		technology = FATERoll.getRoll();
-		environment = FATERoll.getRoll();
-		resources = FATERoll.getRoll();
-		
-		if (technology + environment >= CapitalLimit) {
-			addNewEmpire();
-		}
-	}
 	
-	public MemberSystem(int tech, int env, int res) {
-		name = "Unnamed";
-		technology = tech;
-		environment = env;
-		resources = res;
-		
-		if (technology + environment >= CapitalLimit) {
-			addNewEmpire();
-		}
-	}
 	
-	public MemberSystem(String systemName, int tech, int env, int res) {
-		name = systemName;
-		technology = tech;
-		environment = env;
-		resources = res;
-		
-		if (technology + environment >= CapitalLimit) {
-			addNewEmpire();
-		}
-	}
 
 	public int getTechnology() {
 		return technology;
